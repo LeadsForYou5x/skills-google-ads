@@ -179,11 +179,11 @@ Depois das rodadas:
    **O que esperar** · R$ X/dia = R$ Y no mês · uns N cliques por mês, a R$ Z cada
    | Se a página converter | Contatos por mês | Custo por contato |
    |---|---|---|
-   | 10% (página fraca) | ... | R$ ... |
-   | 15% (a média) | ... | R$ ... |
+   | 10% (página comum) | ... | R$ ... |
+   | 15% (página boa) | ... | R$ ... |
    | 20% ou mais (muito boa) | ... | R$ ... |
 
-   Converter = de cada 100 que clicam, quantos chamam. É estimativa, não promessa. Se tiver sazonalidade forte ou volume em faixas (conta sem gasto), 1 linha avisando.
+   Converter = de cada 100 que clicam, quantos chamam. É estimativa, não promessa: a média de mercado em Pesquisa fica perto de 8%. Se tiver sazonalidade forte ou volume em faixas (conta sem gasto), 1 linha avisando.
 
    **Concorrentes:** um link da Central de Transparência por concorrente.
 
