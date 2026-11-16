@@ -1,0 +1,13 @@
+{
+  "name": "google-ads-claude",
+  "owner": {
+    "name": "Guilherme Silva"
+  },
+  "plugins": [
+    {
+      "name": "google-ads-claude",
+      "source": "./",
+      "description": "Subir campanha de Pesquisa em etapas e otimizar no método do Matheus Zappiello."
+    }
+  ]
+}

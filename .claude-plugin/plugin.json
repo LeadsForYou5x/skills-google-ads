@@ -1,0 +1,9 @@
+{
+  "name": "google-ads-claude",
+  "version": "1.0.0",
+  "description": "Skills de Google Ads no método do Matheus Zappiello: subir campanha de Pesquisa em etapas e revisar termos, palavras-chave, lances, anúncios e a conta inteira, e deixar as otimizações agendadas.",
+  "author": {
+    "name": "Guilherme Silva"
+  },
+  "keywords": ["google-ads", "pesquisa", "rsa", "palavras-chave", "otimizacao", "auditoria"]
+}
