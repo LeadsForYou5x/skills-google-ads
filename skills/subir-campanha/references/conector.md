@@ -1,6 +1,6 @@
 # Conector do Google Ads: ferramentas e armadilhas
 
-A skill foi escrita e testada com o **Pipeboard** (`https://google-ads.mcp.pipeboard.co/`). Com outro conector, use a ferramenta equivalente; os nomes abaixo são os do Pipeboard.
+A skill foi escrita e testada com o **Pipeboard** (`https://google-ads.mcp.pipeboard.co/`). Ela só roda com ele: não use outro conector de Google Ads no lugar, mesmo que esteja ligado. Os nomes abaixo são os do Pipeboard.
 
 ## Tudo que o Pipeboard faz no Google Ads (e onde o pacote usa)
 | Pra quê | Ferramentas | Onde entra |

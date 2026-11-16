@@ -14,7 +14,7 @@ Pacote de 7 skills pro Claude subir, otimizar e deixar no piloto campanhas de **
 
 ## O que você precisa
 1. **Plano pago do Claude** (Pro ou Max) e o **app do Claude** instalado ([claude.ai/download](https://claude.ai/download)). As skills rodam na aba **Code**.
-2. **Conector do Google Ads.** O pacote foi feito e testado com o **Pipeboard**, nesta ordem:
+2. **Conector do Google Ads.** O pacote foi feito e testado só com o **Pipeboard** e só roda com ele: as skills não usam outro conector de Google Ads, mesmo que esteja ligado. Pra ligar, nesta ordem:
    1. Em [pipeboard.co](https://pipeboard.co), crie a conta e ligue o seu Google Ads lá dentro.
    2. No app do Claude: **Configurações › Conectores › Adicionar conector personalizado**, nome `Pipeboard`, URL `https://google-ads.mcp.pipeboard.co/`. Clique em Conectar e vincule a conta do Pipeboard.
    3. Plano grátis: 2 contas por mês e 30 execuções por semana. Uma campanha completa usa umas 11 execuções (a subida em si, 4; mais 1 se a campanha precisar de meta de conversão própria): a skill só usa o conector pro que a subida precisa, e o resto (pagamento, campanhas antigas, conversão) você confere no Google Ads.

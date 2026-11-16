@@ -7,6 +7,11 @@ description: "Agenda o calendário de otimização do Google Ads no Claude: as r
 
 O Claude passa a cuidar da conta no dia certo. Cada tarefa agendada **só lê a conta e salva um relatório**: nada muda no Google Ads sem o OK do usuário. Diga isso em 1 linha no começo. O usuário pode ser iniciante: fale simples e curto, mostre o resultado e não o processo.
 
+## Conector: só o Pipeboard
+Esta skill foi feita e testada só com o conector **Pipeboard** (as ferramentas `google_ads_*` dele). Antes da primeira leitura ou gravação, confira se ele está ligado nesta conversa.
+- Use **só** as ferramentas do Pipeboard. Não procure nem use outro conector de Google Ads, mesmo que esteja ligado e pareça fazer o mesmo: os nomes, os formatos e o jeito de gravar são outros, e nada aqui foi testado neles.
+- **Sem o Pipeboard ligado:** diga em 1 linha que esta skill só roda com ele, mostre como ligar (Configurações › Conectores › Adicionar conector personalizado, nome `Pipeboard`, URL `https://google-ads.mcp.pipeboard.co/`) e pare. Não troque de conector por conta própria. As tarefas que esta skill cria também dependem dele.
+
 ## 1. Saber o negócio e a conta
 - Se você veio de outra skill nesta conversa (`/subir-campanha`, `/auditoria` ou uma revisão), use o negócio, a conta e a campanha dela e vá direto pro passo 2.
 - Senão, veja `google-ads/` na pasta aberta. Um negócio salvo: use ele. Mais de um: pergunte no popup qual é (até 4 nomes; se houver mais, os mexidos por último). Leia só o `negocio.md` dele (conta e campanhas).

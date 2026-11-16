@@ -7,6 +7,11 @@ description: "Auditoria completa de uma conta de Google Ads (campanhas de Pesqui
 
 Uma fotografia da conta inteira, comparada com o método do Matheus, terminando nas 5 coisas que mais dão dinheiro corrigir. **A auditoria só lê a conta.** Na conversa, depois dela, o usuário escolhe por onde começar e a correção é aplicada com o OK dele.
 
+## Conector: só o Pipeboard
+Esta skill foi feita e testada só com o conector **Pipeboard** (as ferramentas `google_ads_*` dele). Antes da primeira leitura ou gravação, confira se ele está ligado nesta conversa.
+- Use **só** as ferramentas do Pipeboard. Não procure nem use outro conector de Google Ads, mesmo que esteja ligado e pareça fazer o mesmo: os nomes, os formatos e o jeito de gravar são outros, e nada aqui foi testado neles.
+- **Sem o Pipeboard ligado:** diga em 1 linha que esta skill só roda com ele, mostre como ligar (Configurações › Conectores › Adicionar conector personalizado, nome `Pipeboard`, URL `https://google-ads.mcp.pipeboard.co/`) e pare. Não troque de conector por conta própria. Se o usuário quiser seguir sem conector, vale só o caminho "Sem conector" desta skill, com arquivos exportados do Google Ads. Numa tarefa agendada, anote no relatório e termine.
+
 ## Como esta skill trabalha
 - **Onde ficam os arquivos:** em `google-ads/<negocio>/`, dentro da pasta aberta nesta conversa (numa tarefa agendada, a pasta em que ela foi criada). Leia o `negocio.md` (o que vende, região, objetivo, ticket, conta) e o `alteracoes.md` (o que já mudou na conta e o que o usuário recusou), se existirem, e não pergunte de novo o que já está lá. Se o `negocio.md` já tem a conta, use ela direto, sem listar as contas de novo. Se o usuário não disse o negócio e houver mais de um salvo, pergunte no popup qual é (até 4 nomes; se houver mais, os mexidos por último). Pasta nova: nome em minúsculas, sem acento e com hífen (ex.: `climatiza-campinas`). Não abra pastas de outros negócios nem comente clientes, contas ou projetos que ele não citou.
 - **Mudança recente:** se o `alteracoes.md` mostra uma mudança de menos de 7 dias no assunto desta revisão, avise logo no começo que os números de 30 dias ainda são, quase todos, de antes dela. Separe o que **já foi resolvido** do que **continua acontecendo** e não proponha de novo o que já foi feito nem o que foi recusado.

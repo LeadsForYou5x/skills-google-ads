@@ -13,6 +13,11 @@ Leia cada referência só quando a etapa pedir, não todas no começo (a skill a
 - `references/regras-anuncio.md`: na etapa 5
 - `references/checklist-conferencia.md`: na etapa 7
 
+## Conector: só o Pipeboard
+Esta skill foi feita e testada só com o conector **Pipeboard** (as ferramentas `google_ads_*` dele). Antes da primeira leitura ou gravação, confira se ele está ligado nesta conversa.
+- Use **só** as ferramentas do Pipeboard. Não procure nem use outro conector de Google Ads, mesmo que esteja ligado e pareça fazer o mesmo: os nomes, os formatos e o jeito de gravar são outros, e nada aqui foi testado neles.
+- **Sem o Pipeboard ligado:** diga em 1 linha que esta skill só roda com ele, mostre como ligar (Configurações › Conectores › Adicionar conector personalizado, nome `Pipeboard`, URL `https://google-ads.mcp.pipeboard.co/`) e pare. Não troque de conector por conta própria. Se o usuário quiser seguir sem conector, vale só o caminho "Sem conector" desta skill, com arquivos exportados do Google Ads. Numa tarefa agendada, anote no relatório e termine.
+
 ## Regra que manda em todas as outras
 **Duas aprovações, uma subida.** O usuário aprova só duas vezes:
 1. **O que vamos comprar:** as palavras, com o volume e a previsão (fim da etapa 3).
