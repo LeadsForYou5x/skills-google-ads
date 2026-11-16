@@ -27,7 +27,7 @@ reclame aqui · reclamação · procon · processo
 | como fazer · passo a passo | serviço que a pessoa não faz sozinha (advogado, contador, seguro, crédito, consórcio) | "como fazer inventário", "como fazer seguro de carro" |
 | manual | estética, fisioterapia, oficina, locação de equipamento | "drenagem linfática manual", "terapia manual", "conserto de câmbio manual" |
 | vídeo | desentupidora, segurança eletrônica, produtora, atendimento online | "vídeo inspeção de tubulação", "instalação de vídeo porteiro", "consulta por vídeo" |
-| comprar · loja · usado · peças | negócio com loja ou que vende e instala, assistência técnica, vistoria, usinagem | "loja de conserto de celular", "vistoria de carro usado", "usinagem de peças" |
+| comprar · loja · usado · peças | negócio com loja ou que vende e instala, assistência técnica, vistoria, usinagem; "comprar" também sai quando o negócio vende plano ou assinatura (internet, academia, plano de saúde) | "loja de conserto de celular", "vistoria de carro usado", "usinagem de peças", "comprar plano de internet" |
 | modelo | o cliente escolhe por modelo (planejados, portões, convites) | "modelo de portão basculante" |
 
 Negativa não pega plural nem feminino: se a palavra fica na lista, ponha as duas formas (emprego · empregos, concurso · concursos, vídeo · vídeos, usado · usados, gratuito · gratuita). Maiúscula e erro de digitação ela já cobre.
