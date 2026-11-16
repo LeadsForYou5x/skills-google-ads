@@ -6,14 +6,14 @@
 param([Parameter(Mandatory = $true)][string]$Arquivo)
 
 $ErrorActionPreference = 'Stop'
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 
 $LIM_TITULO = 30; $LIM_DESCRICAO = 90; $LIM_CAMINHO = 15
 $N_TITULOS = 15; $N_DESCRICOES = 4
 $TITULO_FINAL = '[Recomendado]'
 $LIM_SITELINK = 25; $LIM_SITELINK_DESC = 35; $LIM_FRASE = 25; $LIM_SNIPPET = 25; $LIM_PRECO = 25
 $IDEAL_SITELINKS = 6; $IDEAL_FRASES = 8; $IDEAL_SNIPPETS = 2
-# Cabeçalhos que a API aceitou no lote (testados). "Bairros" está na lista do Google, mas a API recusa.
+# Cabeçalhos que a API aceitou no lote (testados). "Bairros" não existe na lista da API (lá é "Vizinhança", ainda não testado).
 $CABECALHOS = @('servicos', 'tipos')
 
 function Texto($valor) {
@@ -84,7 +84,8 @@ function ValidarGrupo($g) {
   foreach ($campo in @('path1', 'path2')) {
     $caminho = Texto $g.$campo
     if ($caminho.Length -gt $LIM_CAMINHO) { $erros.Add("$campo com $($caminho.Length) caracteres (máx $LIM_CAMINHO): `"$caminho`"") }
-    if ($caminho -and ((Normalizar $caminho) -cne $caminho.ToLowerInvariant())) { $avisos.Add("$campo com acento ou espaço: `"$caminho`"") }
+    if ($caminho -match '\s') { $erros.Add("$campo com espaço (o Google recusa; use hífen): `"$caminho`"") }
+    elseif ($caminho -and ((Normalizar $caminho) -cne $caminho.ToLowerInvariant())) { $avisos.Add("$campo com acento: `"$caminho`"") }
   }
   if ((Texto $g.path2) -and -not (Texto $g.path1)) { $erros.Add('path2 preenchido sem path1') }
 
@@ -92,7 +93,7 @@ function ValidarGrupo($g) {
   if (-not $url.StartsWith('https://')) { $erros.Add("link final precisa começar com https:// (veio `"$url`")") }
 
   $fixados = 0; if ($g.titulos_fixados) { $fixados = @($g.titulos_fixados | Where-Object { $_ }).Count }
-  if ($fixados -gt 1) { $avisos.Add("$fixados títulos fixados (o ideal é no máximo 1)") }
+  if ($fixados -gt 0) { $erros.Add("$fixados título(s) fixado(s): o método não fixa título") }
 
   return @{ erros = $erros; avisos = $avisos }
 }
@@ -104,7 +105,7 @@ function ValidarRecursos($r) {
   $sitelinks = @(); if ($r.sitelinks) { $sitelinks = @($r.sitelinks) }
   if ($sitelinks.Count -lt 4) { $erros.Add("$($sitelinks.Count) sitelinks (mínimo 4, o ideal é $IDEAL_SITELINKS)") }
   elseif ($sitelinks.Count -lt $IDEAL_SITELINKS) { $avisos.Add("$($sitelinks.Count) sitelinks (o ideal é $IDEAL_SITELINKS)") }
-  $textos = @{}; $urls = @{}
+  $textos = @{}; $urls = New-Object System.Collections.Hashtable ([System.StringComparer]::Ordinal)
   foreach ($s in $sitelinks) {
     $texto = Texto $s.texto; $d1 = Texto $s.descricao1; $d2 = Texto $s.descricao2; $url = Texto $s.url
     if (-not $texto -or $texto.Length -gt $LIM_SITELINK) { $erros.Add("sitelink com $($texto.Length) caracteres no nome (de 1 a $LIM_SITELINK): `"$texto`"") }
@@ -112,6 +113,7 @@ function ValidarRecursos($r) {
     foreach ($d in @($d1, $d2)) {
       if ($d.Length -gt $LIM_SITELINK_DESC) { $erros.Add("descrição de sitelink com $($d.Length) caracteres (máx $LIM_SITELINK_DESC): `"$d`"") }
     }
+    if ("$texto$d1$d2".Contains('!')) { $erros.Add("sitelink com exclamação (o Google reprova): `"$texto`"") }
     if (-not $url.StartsWith('https://')) { $erros.Add("sitelink `"$texto`" com link que não começa com https:// (veio `"$url`")") }
     $chave = Normalizar $texto
     if ($textos.ContainsKey($chave)) { $erros.Add("nome de sitelink repetido: `"$texto`"") }
@@ -138,7 +140,7 @@ function ValidarRecursos($r) {
   foreach ($sn in $snippets) {
     $cab = Texto $sn.cabecalho
     $valores = @(); if ($sn.valores) { $valores = @($sn.valores | ForEach-Object { Texto $_ }) }
-    if ($CABECALHOS -notcontains (Normalizar $cab)) { $erros.Add("cabeçalho de snippet que a API não aceita: `"$cab`" (use Serviços ou Tipos; Bairros é recusado)") }
+    if ($CABECALHOS -notcontains (Normalizar $cab)) { $erros.Add("cabeçalho de snippet que a API não aceita: `"$cab`" (use Serviços ou Tipos; pra bairros o nome na API é Vizinhança, ainda não testado)") }
     if ($valores.Count -lt 3 -or $valores.Count -gt 10) { $erros.Add("snippet `"$cab`" com $($valores.Count) valores (de 3 a 10)") }
     elseif ($valores.Count -lt 4) { $avisos.Add("snippet `"$cab`" com 3 valores (o ideal é 4 ou mais)") }
     foreach ($v in $valores) {
@@ -166,11 +168,18 @@ function ValidarRecursos($r) {
   return @{ erros = $erros; avisos = $avisos }
 }
 
-$dados = Get-Content -Raw -Encoding UTF8 -Path $Arquivo | ConvertFrom-Json
+$dados = Get-Content -Raw -Encoding UTF8 -LiteralPath $Arquivo | ConvertFrom-Json
 $totalErros = 0
 
 $grupos = @(); if ($dados.grupos) { $grupos = @($dados.grupos) }
 $recursos = @(); if ($dados.recursos) { $recursos = @($dados.recursos) }
+
+if ($grupos.Count -eq 0 -and $recursos.Count -eq 0) {
+  Write-Output ''
+  Write-Output '== Arquivo: 1 ERRO(S)'
+  Write-Output '  ERRO  nada pra validar: o arquivo não tem "grupos" nem "recursos" (veja o formato no SKILL.md)'
+  $totalErros += 1
+}
 
 foreach ($g in $grupos) {
   $r = ValidarGrupo $g

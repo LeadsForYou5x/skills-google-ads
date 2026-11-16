@@ -13,7 +13,7 @@ N_TITULOS, N_DESCRICOES = 15, 4
 TITULO_FINAL = "[Recomendado]"
 LIM_SITELINK, LIM_SITELINK_DESC, LIM_FRASE, LIM_SNIPPET, LIM_PRECO = 25, 35, 25, 25, 25
 IDEAL_SITELINKS, IDEAL_FRASES, IDEAL_SNIPPETS = 6, 8, 2
-# Cabeçalhos que a API aceitou no lote (testados). "Bairros" está na lista do Google, mas a API recusa (INVALID_FORMAT).
+# Cabeçalhos que a API aceitou no lote (testados). "Bairros" não existe na lista da API (lá é "Vizinhança", ainda não testado): dá INVALID_FORMAT.
 CABECALHOS = {"servicos", "tipos"}
 
 
@@ -62,7 +62,7 @@ def validar_grupo(g):
             erros.append(f"texto repetido: \"{t}\"")
         vistos[chave] = True
 
-    palavra = normalizar(g.get("palavra_principal", ""))
+    palavra = normalizar(g.get("palavra_principal") or "")
     if palavra:
         com_palavra = sum(1 for t in titulos if palavra in normalizar(t))
         if com_palavra == 0:
@@ -73,21 +73,23 @@ def validar_grupo(g):
         avisos.append("sem \"palavra_principal\" informada: não deu pra conferir a palavra nos títulos")
 
     for campo in ("path1", "path2"):
-        caminho = g.get(campo, "")
+        caminho = (g.get(campo) or "").strip()
         if len(caminho) > LIM_CAMINHO:
             erros.append(f"{campo} com {len(caminho)} caracteres (máx {LIM_CAMINHO}): \"{caminho}\"")
-        if caminho and normalizar(caminho) != caminho.lower():
-            avisos.append(f"{campo} com acento ou espaço: \"{caminho}\"")
+        if any(c.isspace() for c in caminho):
+            erros.append(f"{campo} com espaço (o Google recusa; use hífen): \"{caminho}\"")
+        elif caminho and normalizar(caminho) != caminho.lower():
+            avisos.append(f"{campo} com acento: \"{caminho}\"")
     if g.get("path2") and not g.get("path1"):
         erros.append("path2 preenchido sem path1")
 
-    url = g.get("url", "")
+    url = (g.get("url") or "").strip()
     if not url.startswith("https://"):
         erros.append(f"link final precisa começar com https:// (veio \"{url}\")")
 
-    fixados = sum(1 for t in g.get("titulos_fixados", []) if t)
-    if fixados > 1:
-        avisos.append(f"{fixados} títulos fixados (o ideal é no máximo 1)")
+    fixados = sum(1 for t in (g.get("titulos_fixados") or []) if t)
+    if fixados:
+        erros.append(f"{fixados} título(s) fixado(s): o método não fixa título")
 
     return nome, erros, avisos
 
@@ -102,9 +104,9 @@ def validar_recursos(r):
         avisos.append(f"{len(sitelinks)} sitelinks (o ideal é {IDEAL_SITELINKS})")
     textos, urls = {}, {}
     for s in sitelinks:
-        texto = s.get("texto", "").strip()
-        d1, d2 = s.get("descricao1", "").strip(), s.get("descricao2", "").strip()
-        url = s.get("url", "").strip()
+        texto = (s.get("texto") or "").strip()
+        d1, d2 = (s.get("descricao1") or "").strip(), (s.get("descricao2") or "").strip()
+        url = (s.get("url") or "").strip()
         if not texto or len(texto) > LIM_SITELINK:
             erros.append(f"sitelink com {len(texto)} caracteres no nome (de 1 a {LIM_SITELINK}): \"{texto}\"")
         if not d1 or not d2:
@@ -112,6 +114,8 @@ def validar_recursos(r):
         for d in (d1, d2):
             if len(d) > LIM_SITELINK_DESC:
                 erros.append(f"descrição de sitelink com {len(d)} caracteres (máx {LIM_SITELINK_DESC}): \"{d}\"")
+        if "!" in texto + d1 + d2:
+            erros.append(f"sitelink com exclamação (o Google reprova): \"{texto}\"")
         if not url.startswith("https://"):
             erros.append(f"sitelink \"{texto}\" com link que não começa com https:// (veio \"{url}\")")
         if normalizar(texto) in textos:
@@ -145,7 +149,7 @@ def validar_recursos(r):
         cab = sn.get("cabecalho", "").strip()
         valores = [v.strip() for v in sn.get("valores", [])]
         if normalizar(cab) not in CABECALHOS:
-            erros.append(f"cabeçalho de snippet que a API não aceita: \"{cab}\" (use Serviços ou Tipos; Bairros é recusado)")
+            erros.append(f"cabeçalho de snippet que a API não aceita: \"{cab}\" (use Serviços ou Tipos; pra bairros o nome na API é Vizinhança, ainda não testado)")
         if not 3 <= len(valores) <= 10:
             erros.append(f"snippet \"{cab}\" com {len(valores)} valores (de 3 a 10)")
         elif len(valores) < 4:
@@ -154,7 +158,7 @@ def validar_recursos(r):
             if len(v) > LIM_SNIPPET:
                 erros.append(f"valor de snippet com {len(v)} caracteres (máx {LIM_SNIPPET}): \"{v}\"")
 
-    if not r.get("telefone", "").strip():
+    if not (r.get("telefone") or "").strip():
         avisos.append("sem telefone: fica sem o recurso de ligação (ok se o negócio não atende ligação)")
 
     precos = r.get("precos", [])
@@ -178,10 +182,18 @@ def main():
     if len(sys.argv) != 2:
         print(__doc__)
         sys.exit(2)
-    with open(sys.argv[1], encoding="utf-8") as f:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    with open(sys.argv[1], encoding="utf-8-sig") as f:
         dados = json.load(f)
+    if not isinstance(dados, dict):
+        dados = {}
 
     total_erros = 0
+    if not dados.get("grupos") and not dados.get("recursos"):
+        print("\n== Arquivo: 1 ERRO(S)")
+        print("  ERRO  nada pra validar: o arquivo não tem \"grupos\" nem \"recursos\" (veja o formato no SKILL.md)")
+        total_erros += 1
     for g in dados.get("grupos", []):
         nome, erros, avisos = validar_grupo(g)
         status = "OK" if not erros else f"{len(erros)} ERRO(S)"

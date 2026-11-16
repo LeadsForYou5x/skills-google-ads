@@ -44,22 +44,27 @@ ls ~/.claude/skills
 ```
 No Windows (PowerShell):
 ```powershell
-Invoke-WebRequest -Uri https://github.com/LeadsForYou5x/skills-google-ads/archive/refs/heads/main.zip -OutFile "$env:TEMP\skills-google-ads.zip"
+Invoke-WebRequest -UseBasicParsing -Uri https://github.com/LeadsForYou5x/skills-google-ads/archive/refs/heads/main.zip -OutFile "$env:TEMP\skills-google-ads.zip"
+Remove-Item "$env:TEMP\skills-google-ads" -Recurse -Force -ErrorAction SilentlyContinue
 Expand-Archive "$env:TEMP\skills-google-ads.zip" -DestinationPath "$env:TEMP\skills-google-ads" -Force
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item "$env:TEMP\skills-google-ads\*\skills\*" "$HOME\.claude\skills\" -Recurse -Force
+Get-ChildItem "$HOME\.claude\skills" -Name
 ```
 Tem que aparecer: `agendar-otimizacao`, `auditoria`, `revisar-anuncios`, `revisar-lances`, `revisar-palavras`, `revisar-termos`, `subir-campanha`.
 
+- **É este o caminho de instalar:** copiar as 7 pastas pra `~/.claude/skills/`, a pasta de skills do usuário (não é a pasta do projeto, e não precisa instalar como plugin).
+- **Copia por cima:** se já existir uma skill com um desses 7 nomes, ela é substituída. Quem tem uma versão própria deve guardar uma cópia antes.
+
 ### Manual
-Copie as 7 pastas de dentro de `skills/` para `~/.claude/skills/` (no Mac, a pasta `.claude` fica na sua pasta de usuário; aperte Cmd + Shift + . pra ver pastas ocultas).
+Copie as 7 pastas de dentro de `skills/` para `~/.claude/skills/` (no Mac, a pasta `.claude` fica na sua pasta de usuário; aperte Cmd + Shift + . pra ver pastas ocultas; no Windows, é `C:\Users\<você>\.claude\skills`).
 
 ### No chat comum (fora da aba Code)
-Na pasta [`zips/`](zips) tem um `.zip` de cada skill. Baixe o da skill que você quer e envie em **Configurações › Capacidades › Skills**. O pacote foi feito e testado na aba Code: é nela que as skills guardam os arquivos de cada negócio.
+No repositório do GitHub, na pasta [`zips/`](zips), tem um `.zip` de cada skill. Baixe o da skill que você quer e envie em **Configurações › Capacidades › Skills**. O pacote foi feito e testado na aba Code: é nela que as skills guardam os arquivos de cada negócio.
 
 ## Como usar
-- **Subir campanha:** digite só `/subir-campanha`. O Claude pergunta o negócio e o site; o resto você responde clicando, em 2 telas de opções. Depois você aprova só 2 vezes: **o que comprar** (palavras pelo Planejador e pela técnica do ABC, as de mais busca com CPC que cabe na verba, com a previsão de cliques e de contatos com a página convertendo 10%, 15% ou 20%) e **o plano final** (anúncio com 15 títulos e recursos completos: 6 sitelinks no hack `#1`, `#2`..., 8 frases de destaque, 2 snippets, ligação e preço; nome da empresa, logo e fotos você coloca no Google Ads). Com o OK, ele sobe tudo pausado, de uma vez, manda um resumo curto e oferece deixar o calendário de otimização agendado (você só marca o que quer).
-- **Use sempre a mesma pasta:** crie uma pasta pro seu trabalho com o Claude (ex.: `Documentos/Claude`) e abra sempre ela na aba Code. As skills guardam tudo em `google-ads/<negocio>/` dentro dela: o perfil do negócio em `negocio.md` e uma pasta por campanha. Na próxima campanha ou revisão do mesmo negócio, o Claude lê esse perfil e só pergunta o que é novo.
+- **Subir campanha:** digite só `/subir-campanha`. O Claude pergunta o negócio e o site; o resto você responde clicando, em 2 telas de opções. Depois você aprova só 2 vezes (fora isso, o app pede permissão na primeira vez que usa cada ferramenta: marque "permitir sempre"): **o que comprar** (palavras pelo Planejador e pela técnica do ABC, as de mais busca com CPC que cabe na verba, com a previsão de cliques e de contatos com a página convertendo 10%, 15% ou 20%) e **o plano final** (anúncio com 15 títulos e recursos completos: 6 sitelinks no hack `#1`, `#2`..., 8 frases de destaque, 2 snippets, ligação e preço; nome da empresa, logo e fotos você coloca no Google Ads). Com o OK, ele sobe tudo pausado, de uma vez, manda um resumo curto e oferece deixar o calendário de otimização agendado (você só marca o que quer).
+- **Use sempre a mesma pasta:** crie uma pasta nova, só pro Google Ads (ex.: `Documentos/Claude`) e abra sempre ela na aba Code. As skills guardam tudo em `google-ads/<negocio>/` dentro dela: o perfil do negócio em `negocio.md` e uma pasta por campanha. Na próxima campanha ou revisão do mesmo negócio, o Claude lê esse perfil e só pergunta o que é novo.
 - **Otimizar:** as 4 revisões e a auditoria mostram cada proposta explicada (o que fazer, por quê, o que muda na conta e o resultado esperado) e só gravam com o seu OK, no popup. O que foi mudado fica anotado em `google-ads/<negocio>/alteracoes.md`.
 - **Calendário de otimização:** digite `/agendar-otimizacao` (a `/subir-campanha` abre ela sozinha no fim). Veja a seção abaixo.
 - **Regra de ouro:** mexeu em lance ou verba, espere 7 a 14 dias antes de mexer de novo.
@@ -84,16 +89,16 @@ Tudo junto, numa conta, dá umas 30 execuções por mês (umas 7 por semana): ca
 - "Nos dias 1 e 15 de cada mês, às 9h, use a skill revisar-anuncios no negócio <negócio> (conta <ID>) e salve o relatório. Não aplique nada na conta."
 - "Todo dia 10, às 9h, use a skill revisar-palavras no negócio <negócio> (conta <ID>) e salve o relatório. Não aplique nada na conta."
 - "Todo dia 20, às 9h, use a skill revisar-lances no negócio <negócio> (conta <ID>) e salve o relatório. Não aplique nada na conta."
-- "No dia 1º de janeiro, abril, julho e outubro, às 10h, use a skill auditoria no negócio <negócio> (conta <ID>) e salve o relatório."
+- "No dia 1º de janeiro, abril, julho e outubro, às 10h, use a skill auditoria no negócio <negócio> (conta <ID>) e salve o relatório. Não aplique nada na conta."
 
 **Pra aplicar:** quando um relatório sair, abra uma conversa nova e peça o que você aprovar (ex.: "aplica as negativas do relatório de termos de hoje").
 
 **Avisos (a `/agendar-otimizacao` também cria):**
-- "Todo dia às 9h, confira no conector Pipeboard o gasto de ontem de cada campanha ativa da conta <nome da conta> e me avise só se alguma gastou zero ou mais que o dobro do orçamento diário. Não altere nada." (gasta 7 execuções por semana)
+- "Todo dia às 9h, confira no conector Pipeboard o gasto de ontem de cada campanha ativa da conta <nome da conta> e me avise só se alguma gastou zero ou 1,5x o orçamento do dia ou mais. Não altere nada." (gasta 7 execuções por semana)
 - "Toda sexta às 17h, faça um resumo da semana da conta <nome da conta> pro cliente: gasto, cliques, contatos e o que foi alterado. Não altere nada."
 
 Três cuidados:
-1. **A primeira vez, rode na mão.** Abra a tarefa e clique em executar agora. Quando o Claude pedir permissão pra usar o Pipeboard (e pra salvar o relatório), escolha permitir sempre. As próximas execuções rodam sozinhas.
+1. **A primeira vez de cada tarefa, rode na mão** (uma por dia, pra não estourar as 30 execuções da semana). Abra a tarefa e clique em executar agora. Quando o Claude pedir permissão pra usar o Pipeboard (e pra salvar o relatório), escolha permitir sempre. As próximas execuções rodam sozinhas.
 2. **Cada execução começa do zero:** o pedido tem que dizer tudo (conta, o que fazer, o que não fazer).
 3. **Roda com o app aberto.** Se o computador estiver desligado, roda quando você abrir. Cada execução gasta execuções do Pipeboard (o vigia diário sozinho gasta 7 por semana).
 

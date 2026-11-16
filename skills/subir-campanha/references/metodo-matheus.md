@@ -35,7 +35,7 @@ Cada serviço leva pra **página própria** (`/instalacao`, `/manutencao`). Nome
 2. **Concorrentes**: termos com nome de concorrentes.
 3. **Institucional**: o nome da própria empresa (marca).
 
-Os três nunca se misturam: cada um é uma campanha, com verba e anúncio próprios. Na de Novos clientes, o nome da empresa e o dos concorrentes entram como negativas.
+Os três nunca se misturam: cada um é uma campanha, com verba e anúncio próprios. Na de Novos clientes, o nome da empresa e o dos concorrentes entram como negativas (menos quando o nome é o próprio serviço ou a cidade, como "Desentupidora Campinas").
 
 ## Planejamento de palavras-chave: as 6 formas
 1. Pensar como se fosse o cliente

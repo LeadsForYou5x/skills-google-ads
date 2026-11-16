@@ -10,7 +10,7 @@ var N_TITULOS = 15, N_DESCRICOES = 4;
 var TITULO_FINAL = '[Recomendado]';
 var LIM_SITELINK = 25, LIM_SITELINK_DESC = 35, LIM_FRASE = 25, LIM_SNIPPET = 25, LIM_PRECO = 25;
 var IDEAL_SITELINKS = 6, IDEAL_FRASES = 8, IDEAL_SNIPPETS = 2;
-// Cabeçalhos que a API aceitou no lote (testados). "Bairros" está na lista do Google, mas a API recusa.
+// Cabeçalhos que a API aceitou no lote (testados). "Bairros" não existe na lista da API (lá é "Vizinhança", ainda não testado).
 var CABECALHOS = ['servicos', 'tipos'];
 
 function normalizar(texto) {
@@ -63,17 +63,18 @@ function validarGrupo(g) {
   }
 
   ['path1', 'path2'].forEach(function (campo) {
-    var caminho = g[campo] || '';
+    var caminho = (g[campo] || '').trim();
     if (caminho.length > LIM_CAMINHO) erros.push(campo + ' com ' + caminho.length + ' caracteres (máx ' + LIM_CAMINHO + '): "' + caminho + '"');
-    if (caminho && normalizar(caminho) !== caminho.toLowerCase()) avisos.push(campo + ' com acento ou espaço: "' + caminho + '"');
+    if (/\s/.test(caminho)) erros.push(campo + ' com espaço (o Google recusa; use hífen): "' + caminho + '"');
+    else if (caminho && normalizar(caminho) !== caminho.toLowerCase()) avisos.push(campo + ' com acento: "' + caminho + '"');
   });
   if (g.path2 && !g.path1) erros.push('path2 preenchido sem path1');
 
-  var url = g.url || '';
+  var url = (g.url || '').trim();
   if (url.indexOf('https://') !== 0) erros.push('link final precisa começar com https:// (veio "' + url + '")');
 
   var fixados = (g.titulos_fixados || []).filter(function (t) { return t; }).length;
-  if (fixados > 1) avisos.push(fixados + ' títulos fixados (o ideal é no máximo 1)');
+  if (fixados) erros.push(fixados + ' título(s) fixado(s): o método não fixa título');
 
   return { erros: erros, avisos: avisos };
 }
@@ -93,6 +94,7 @@ function validarRecursos(r) {
     [d1, d2].forEach(function (d) {
       if (d.length > LIM_SITELINK_DESC) erros.push('descrição de sitelink com ' + d.length + ' caracteres (máx ' + LIM_SITELINK_DESC + '): "' + d + '"');
     });
+    if ((texto + d1 + d2).indexOf('!') !== -1) erros.push('sitelink com exclamação (o Google reprova): "' + texto + '"');
     if (url.indexOf('https://') !== 0) erros.push('sitelink "' + texto + '" com link que não começa com https:// (veio "' + url + '")');
     if (textos[normalizar(texto)]) erros.push('nome de sitelink repetido: "' + texto + '"');
     textos[normalizar(texto)] = true;
@@ -117,7 +119,7 @@ function validarRecursos(r) {
   snippets.forEach(function (sn) {
     var cab = (sn.cabecalho || '').trim();
     var valores = (sn.valores || []).map(function (v) { return v.trim(); });
-    if (CABECALHOS.indexOf(normalizar(cab)) === -1) erros.push('cabeçalho de snippet que a API não aceita: "' + cab + '" (use Serviços ou Tipos; Bairros é recusado)');
+    if (CABECALHOS.indexOf(normalizar(cab)) === -1) erros.push('cabeçalho de snippet que a API não aceita: "' + cab + '" (use Serviços ou Tipos; pra bairros o nome na API é Vizinhança, ainda não testado)');
     if (valores.length < 3 || valores.length > 10) erros.push('snippet "' + cab + '" com ' + valores.length + ' valores (de 3 a 10)');
     else if (valores.length < 4) avisos.push('snippet "' + cab + '" com 3 valores (o ideal é 4 ou mais)');
     valores.forEach(function (v) {
@@ -143,13 +145,27 @@ function validarRecursos(r) {
   return { erros: erros, avisos: avisos };
 }
 
+// Imprime e sai com o mesmo código do .py: 0 aprovado, 1 com ERRO, 2 uso errado.
+function sair(texto, codigo) {
+  ObjC.import('stdlib');
+  $.NSFileHandle.fileHandleWithStandardOutput.writeData($(texto + '\n').dataUsingEncoding($.NSUTF8StringEncoding));
+  $.exit(codigo);
+}
+
 function run(argv) {
-  if (argv.length !== 1) return 'Uso: osascript -l JavaScript validar_anuncio.js anuncios.json';
+  if (argv.length !== 1) return sair('Uso: osascript -l JavaScript validar_anuncio.js anuncios.json', 2);
   var texto = $.NSString.stringWithContentsOfFileEncodingError(argv[0], $.NSUTF8StringEncoding, null);
-  if (!texto) return 'ERRO: não consegui ler o arquivo ' + argv[0];
+  if (!texto || texto.isNil()) return sair('ERRO: não consegui ler o arquivo ' + argv[0], 1);
   var dados = JSON.parse(ObjC.unwrap(texto));
+  if (!dados || typeof dados !== 'object' || Array.isArray(dados)) dados = {};
 
   var linhas = [], totalErros = 0;
+  if (!(dados.grupos || []).length && !(dados.recursos || []).length) {
+    linhas.push('');
+    linhas.push('== Arquivo: 1 ERRO(S)');
+    linhas.push('  ERRO  nada pra validar: o arquivo não tem "grupos" nem "recursos" (veja o formato no SKILL.md)');
+    totalErros += 1;
+  }
   (dados.grupos || []).forEach(function (g) {
     var r = validarGrupo(g);
     linhas.push('');
@@ -168,5 +184,5 @@ function run(argv) {
   });
   linhas.push('');
   linhas.push('Resultado: ' + (totalErros === 0 ? 'aprovado' : totalErros + ' erro(s) pra corrigir'));
-  return linhas.join('\n');
+  return sair(linhas.join('\n'), totalErros ? 1 : 0);
 }

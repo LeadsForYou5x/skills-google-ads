@@ -7,6 +7,7 @@ Rode todas ao mesmo tempo. Cada uma gasta 1 execução do Pipeboard. Use como es
 SELECT customer.currency_code, campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type,
        campaign.bidding_strategy_type, campaign.bidding_strategy_system_status,
        campaign.primary_status, campaign.primary_status_reasons,
+       campaign.maximize_conversions.target_cpa_micros, campaign.target_spend.cpc_bid_ceiling_micros,
        campaign.network_settings.target_google_search, campaign.network_settings.target_search_network,
        campaign.network_settings.target_content_network,
        campaign.geo_target_type_setting.positive_geo_target_type, campaign_budget.amount_micros,
@@ -50,19 +51,21 @@ SELECT campaign.id, campaign.status, campaign_criterion.type, campaign_criterion
        campaign_criterion.location.geo_target_constant, campaign_criterion.proximity.radius,
        campaign_criterion.proximity.radius_units, campaign_criterion.proximity.address.city_name,
        campaign_criterion.proximity.address.street_address,
+       campaign_criterion.proximity.geo_point.latitude_in_micro_degrees,
+       campaign_criterion.proximity.geo_point.longitude_in_micro_degrees,
        campaign_criterion.language.language_constant, campaign_criterion.ad_schedule.day_of_week,
        campaign_criterion.ad_schedule.start_hour, campaign_criterion.ad_schedule.end_hour,
        campaign_criterion.bid_modifier
 FROM campaign_criterion
 WHERE campaign_criterion.type IN ('LOCATION', 'PROXIMITY', 'LANGUAGE', 'AD_SCHEDULE') AND campaign.status = 'ENABLED'
 ```
-Português é `languageConstants/1014`. Horário certo: 7 linhas, uma por dia (ou só os dias em que o negócio atende). Raio (`PROXIMITY`): confira a unidade e o endereço do centro; mais de um raio na mesma campanha ou centro longe do negócio é ATENÇÃO.
+Português é `languageConstants/1014`. Horário certo: 7 linhas, uma por dia (ou só os dias em que o negócio atende). Raio (`PROXIMITY`): confira a unidade e o centro (endereço ou, no raio criado pela `/subir-campanha`, latitude e longitude); mais de um raio na mesma campanha ou centro longe do negócio é ATENÇÃO.
 
 ## 6. Palavras-chave
 ```sql
 SELECT campaign.id, campaign.name, campaign.status, ad_group.id, ad_group.name, ad_group.status,
        ad_group_criterion.criterion_id, ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type,
-       ad_group_criterion.status, ad_group_criterion.system_serving_status,
+       ad_group_criterion.status, ad_group_criterion.negative, ad_group_criterion.system_serving_status,
        ad_group_criterion.quality_info.quality_score,
        ad_group_criterion.quality_info.creative_quality_score,
        ad_group_criterion.quality_info.post_click_quality_score,
@@ -70,11 +73,11 @@ SELECT campaign.id, campaign.name, campaign.status, ad_group.id, ad_group.name, 
        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
 FROM keyword_view
 WHERE segments.date DURING LAST_30_DAYS AND ad_group.status = 'ENABLED' AND campaign.status = 'ENABLED'
-  AND ad_group_criterion.status = 'ENABLED'
+  AND ad_group_criterion.status = 'ENABLED' AND ad_group_criterion.negative = FALSE
 ORDER BY metrics.cost_micros DESC
 LIMIT 1000
 ```
-Palavra sem impressão vem com 0.
+Palavra sem impressão vem com 0. As negativas do grupo ficam de fora.
 
 ## 7. Termos de pesquisa (as 300 buscas que mais gastaram)
 ```sql
@@ -101,7 +104,7 @@ WHERE ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD' AND segments.date DURING LAST
 Título fixado aparece com `pinnedField` dentro de `headlines`.
 
 ## 9. Negativas
-`google_ads_get_negative_keywords` com `include_shared_lists: true`: traz as negativas da conta inteira (campanhas e grupos) e o nome das listas compartilhadas.
+`google_ads_get_negative_keywords` com `include_shared_lists: true`: traz as negativas da conta inteira (campanhas e grupos) e, das listas compartilhadas, só o nome e o tamanho. Se houver lista com palavras, leia o conteúdo (`google_ads_get_shared_negative_keyword_lists`, 1 execução a mais).
 
 ## 10. Recursos
-`google_ads_get_extensions`: sitelinks, frases de destaque, snippets e ligação da conta toda. Preço não aparece nessa leitura.
+`google_ads_get_extensions` com `status_filter: "ENABLED"`: sitelinks, frases de destaque, snippets e ligação da conta toda. Considere só os das campanhas ativas. Preço não aparece nessa leitura.
