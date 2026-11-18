@@ -72,6 +72,7 @@ Uma tarefa por opção marcada, com a ferramenta de tarefas agendadas do app (`c
 - `title`: "<O que roda>: <negócio>" (ex.: "Revisão de termos: Climatiza"). `taskId`: curto, em minúsculas e com hífen (ex.: `termos-climatiza`).
 - `description` (a ferramenta exige): 1 linha com o que a tarefa faz (ex.: "Revisão de termos da Climatiza: só lê a conta e salva o relatório").
 - `prompt`: completo, porque cada execução começa do zero, sem lembrar desta conversa.
+- As 4 revisões têm dois tamanhos, rápida e completa. A tarefa agendada faz a **completa**. Se o usuário pedir a rápida (ou quiser gastar menos execuções), acrescente no fim do pedido da revisão: "Faça a revisão rápida."
 
 Pedido das revisões e da auditoria:
 > Use a skill <nome da skill> no negócio <negócio> (arquivos em google-ads/<negocio>/, na pasta <caminho completo da pasta aberta>). Conta <nome> (ID <id>). Esta é uma tarefa agendada: não pergunte nada, salve o relatório em google-ads/<negocio>/revisoes/ e não altere nada na conta. Se ainda houver pouco dado, siga o que a skill manda pra esse caso, diga no relatório o que falta e salve mesmo assim. Termine com 3 linhas: o achado mais importante, onde está o relatório e como aplicar.

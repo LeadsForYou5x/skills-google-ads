@@ -12,6 +12,8 @@ Pacote de 7 skills pro Claude subir, otimizar e deixar no piloto campanhas de **
 | `/auditoria` | Raio-x da conta com nota de 0 a 100 e as 5 prioridades em R$ | Lê; o que você escolher corrigir, só com o seu OK |
 | `/agendar-otimizacao` | Mostra o calendário num popup e deixa as revisões, a auditoria e os avisos agendados | Não: só cria as tarefas no Claude |
 
+As 4 revisões têm dois tamanhos: **rápida** (só o principal, 1 a 3 execuções) e **completa** (mais leituras e mais detalhe). É só pedir, por exemplo `/revisar-termos rápida`; se você não disser, o Claude pergunta.
+
 ## O que você precisa
 1. **Plano pago do Claude** (Pro ou Max) e o **app do Claude** instalado ([claude.ai/download](https://claude.ai/download)). As skills rodam na aba **Code**.
 2. **Conector do Google Ads.** O pacote foi feito e testado só com o **Pipeboard** e só roda com ele: as skills não usam outro conector de Google Ads, mesmo que esteja ligado. Pra ligar, nesta ordem:
