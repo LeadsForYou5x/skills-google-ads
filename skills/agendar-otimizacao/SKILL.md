@@ -43,8 +43,8 @@ Depois, um popup com 3 perguntas (ferramenta `AskUserQuestion`). Mostre todas as
 - **Lances · dia 20, 9h**: "Vê se faltou verba, se o clique está caro e onde ajustar."
 
 **2. Auditoria**: "E o raio-x completo da conta, com nota de 0 a 100 e as 5 prioridades?"
-- **A cada 3 meses (Recomendado)**: "No dia 1º de janeiro, abril, julho e outubro, às 10h. Umas 10 execuções por vez."
-- **Todo mês**: "No dia 1º. Umas 10 execuções por mês."
+- **A cada 3 meses (Recomendado)**: "No dia 1º de janeiro, abril, julho e outubro, às 10h. Umas 11 execuções por vez."
+- **Todo mês**: "No dia 1º. Umas 11 execuções por mês."
 - **Não agendar**: "Você roda quando quiser, com /auditoria."
 
 **3. Avisos** (`multiSelect`): "Quer também os avisos? Se não quiser nenhum, é só pular."

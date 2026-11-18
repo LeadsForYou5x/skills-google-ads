@@ -1,4 +1,4 @@
-# As 10 leituras da auditoria
+# As 11 leituras da auditoria
 
 Rode todas ao mesmo tempo. Cada uma gasta 1 execução do Pipeboard. Use como estão, sem acrescentar campo. Valores em micros: divida por 1.000.000. Se o Google recusar alguma, corrija uma vez (o erro diz o campo); se falhar de novo, marque os itens dela como "não conferido" e siga.
 
@@ -79,16 +79,16 @@ LIMIT 1000
 ```
 Palavra sem impressão vem com 0. As negativas do grupo ficam de fora.
 
-## 7. Termos de pesquisa (as 300 buscas que mais gastaram)
+## 7. Termos de pesquisa (as 60 buscas que mais gastaram)
 ```sql
-SELECT campaign.id, campaign.name, campaign.advertising_channel_type, ad_group.id, ad_group.name,
+SELECT campaign.id, campaign.advertising_channel_type, ad_group.id, ad_group.name,
        search_term_view.search_term, search_term_view.status,
        segments.keyword.info.text, segments.keyword.info.match_type,
        metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
 FROM search_term_view
 WHERE segments.date DURING LAST_30_DAYS AND campaign.advertising_channel_type = 'SEARCH'
 ORDER BY metrics.cost_micros DESC
-LIMIT 300
+LIMIT 60
 ```
 
 ## 8. Anúncios
@@ -108,3 +108,15 @@ Título fixado aparece com `pinnedField` dentro de `headlines`.
 
 ## 10. Recursos
 `google_ads_get_extensions` com `status_filter: "ENABLED"`: sitelinks, frases de destaque, snippets e ligação da conta toda. Considere só os das campanhas ativas. Preço não aparece nessa leitura.
+
+## 11. Recursos ligados ao grupo
+A leitura 10 só traz o que está ligado à campanha. Antes de dizer que falta sitelink, frase ou snippet, leia também os do grupo (1 execução):
+```sql
+SELECT campaign.status, ad_group.id, ad_group.name, ad_group.status, ad_group_asset.field_type, ad_group_asset.status,
+       asset.sitelink_asset.link_text, asset.callout_asset.callout_text, asset.structured_snippet_asset.header,
+       asset.final_urls
+FROM ad_group_asset
+WHERE ad_group_asset.status = 'ENABLED' AND campaign.status = 'ENABLED' AND ad_group.status = 'ENABLED'
+  AND ad_group_asset.field_type IN ('SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET', 'CALL')
+```
+Só falta recurso num grupo se ele não tiver nem o do grupo nem o da campanha. Confira também se o link de cada sitelink do grupo leva pra página daquele grupo.

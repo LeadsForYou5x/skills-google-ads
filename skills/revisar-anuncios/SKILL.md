@@ -15,11 +15,13 @@ Esta skill foi feita e testada só com o conector **Pipeboard** (as ferramentas 
 ## Como esta skill trabalha
 - **Onde ficam os arquivos:** em `google-ads/<negocio>/`, dentro da pasta aberta nesta conversa (numa tarefa agendada, a pasta em que ela foi criada). Leia o `negocio.md` (o que vende, região, objetivo, ticket, conta) e o `alteracoes.md` (o que já mudou na conta e o que o usuário recusou), se existirem, e não pergunte de novo o que já está lá. Se o `negocio.md` já tem a conta, use ela direto, sem listar as contas de novo. Se o usuário não disse o negócio e houver mais de um salvo, pergunte no popup qual é (até 4 nomes; se houver mais, os mexidos por último). Pasta nova: nome em minúsculas, sem acento e com hífen (ex.: `climatiza-campinas`). Não abra pastas de outros negócios nem comente clientes, contas ou projetos que ele não citou.
 - **Mudança recente:** se o `alteracoes.md` mostra uma mudança de menos de 7 dias no assunto desta revisão, avise logo no começo que os números de 30 dias ainda são, quase todos, de antes dela. Separe o que **já foi resolvido** do que **continua acontecendo** e não proponha de novo o que já foi feito nem o que foi recusado.
+- **Nada ativo ou sem dado:** se a leitura voltar vazia, quase sempre é porque não há campanha de Pesquisa ativa (a campanha criada pela `/subir-campanha` nasce pausada) ou porque ela ainda não teve impressão. Não invente análise e não gaste outra execução procurando. Diga em 1 linha o que aconteceu e o que fazer ("a campanha está pausada: ative no Google Ads e rode esta revisão depois de uns 7 dias no ar") e pare. Numa tarefa agendada, salve um relatório de 3 linhas dizendo isso.
+- **Resposta grande demais:** se o conector avisar que a resposta passou do limite e foi salva num arquivo, não rode a mesma leitura de novo. Leia o arquivo (por partes, ou com um comando que some os números por grupo, palavra ou busca) e siga. Se não der pra ler o arquivo, rode a leitura de novo com o `LIMIT` pela metade e diga no relatório que olhou só essa parte.
 - **Negócio sem `negocio.md`** (conta que não foi criada pela `/subir-campanha`): pergunte no chat, numa mensagem só, o nome do negócio e o que ele vende. Liste as contas (`google_ads_list_customers`, 1 execução) e pergunte num popup só: qual é a conta (uma opção por conta, com nome e ID, só as que vêm com `can_query_metrics` verdadeiro, porque as outras são contas de gerente; com 1 conta só, não pergunte: use ela e diga o nome no chat; com mais de 4, mostre as 4 de nome mais parecido com o negócio, e as outras vão no "Outro"), o que conta como resultado (WhatsApp, ligação, formulário, venda; `multiSelect`), quanto vale um cliente (em faixas) e em que dias atende. Salve o `negocio.md` na hora, pra próxima revisão não perguntar de novo. Numa tarefa agendada, não pergunte: use a conta do pedido, siga sem o perfil e anote no relatório o que faltou.
 - **Tarefa agendada** (o pedido já diz o negócio e a conta e manda não alterar nada): não pergunte nada. Decida pelo padrão, anote as dúvidas no relatório, salve e pare, sem aplicar nada. Termine com 3 linhas: o achado mais importante, onde está o relatório e como aplicar ("abra uma conversa nesta pasta e peça: aplica o relatório de anúncios de DD/MM").
 - **Na conversa:** toda decisão vai no popup (ferramenta `AskUserQuestion`: opções pra clicar e o campo "Outro"). Se ele não existir, pergunte no chat.
 - **Aplicar um relatório já salvo:** se o usuário pedir pra aplicar um relatório (ex.: "aplica o relatório de anúncios de hoje"), não refaça a análise. Leia o mais recente desse tipo em `revisoes/`, mostre as propostas dele e vá pro passo 5 (Aplicar). Se ele tiver mais de 7 dias, avise e pergunte no popup se refaz antes.
-- **Execuções do Pipeboard:** ler gasta 3 (os anúncios, o desempenho de cada título e os recursos); aplicar, 1 por anúncio e 1 pro lote de recursos. Rode ao mesmo tempo as leituras que não dependem uma da outra. Se o Google recusar uma consulta, corrija uma vez (o erro diz o campo); se falhar de novo, pule esse item, marque "não conferido" no relatório e siga. Antes de gastar mais que o previsto, pergunte (na agendada, não gaste: anote no relatório o que ficou sem conferir, termine e salve).
+- **Execuções do Pipeboard:** ler gasta 4 (os anúncios, os recursos da campanha, os recursos dos grupos e o desempenho de cada título); aplicar, 1 por anúncio e 1 pro lote de recursos. Rode ao mesmo tempo as leituras que não dependem uma da outra. Se o Google recusar uma consulta, corrija uma vez (o erro diz o campo); se falhar de novo, pule esse item, marque "não conferido" no relatório e siga. Antes de gastar mais que o previsto, pergunte (na agendada, não gaste: anote no relatório o que ficou sem conferir, termine e salve).
 - **Como falar:** mostre o resultado, não o processo (nada de contar consulta, ferramenta ou arquivo). Frase simples, tabelas, números em destaque e nenhum termo técnico sem explicação.
 
 ## Como explicar cada proposta
@@ -53,20 +55,30 @@ WHERE ad_group_ad.ad.type = 'RESPONSIVE_SEARCH_AD' AND segments.date DURING LAST
   AND campaign.status = 'ENABLED' AND ad_group.status = 'ENABLED' AND ad_group_ad.status != 'REMOVED'
 ```
 Anúncio sem impressão também vem (com 0). Pra revisar uma campanha ainda pausada, tire `campaign.status = 'ENABLED'`. Título fixado aparece com `pinnedField` dentro de `headlines`.
-Desempenho de cada título/descrição:
+Desempenho de cada título (só os títulos, até 75 linhas: com descrição e mais campos a resposta estoura o tamanho que o conector devolve; com mais de 5 grupos, rode por campanha ou diga que olhou os 75 que mais apareceram):
 ```sql
-SELECT campaign.name, campaign.status, ad_group.id, ad_group.name, ad_group.status, ad_group_ad.ad.id,
-       ad_group_ad_asset_view.field_type,
-       ad_group_ad_asset_view.performance_label, ad_group_ad_asset_view.enabled, asset.text_asset.text,
-       metrics.impressions, metrics.clicks, metrics.conversions
+SELECT campaign.status, ad_group.name, ad_group.status,
+       ad_group_ad_asset_view.field_type, ad_group_ad_asset_view.performance_label, asset.text_asset.text,
+       metrics.impressions, metrics.clicks
 FROM ad_group_ad_asset_view
 WHERE segments.date DURING LAST_30_DAYS AND ad_group_ad_asset_view.enabled = TRUE
+  AND ad_group_ad_asset_view.field_type = 'HEADLINE'
   AND campaign.status = 'ENABLED' AND ad_group.status = 'ENABLED'
 ORDER BY metrics.impressions DESC
-LIMIT 500
+LIMIT 75
 ```
 O rótulo de desempenho (`performance_label`) deixou de vir em muitas contas: chega `NOT_APPLICABLE` em tudo. Nesse caso, ou se o Google recusar o campo, compare pelos números: o clique de cada título (cliques ÷ impressões) contra o do anúncio inteiro, e contra o mesmo título em outro grupo. Regra das consultas: campo de outro recurso usado no WHERE também vai no SELECT.
 Recursos (1 execução, a conta toda): `google_ads_get_extensions` com `status_filter: "ENABLED"`. Ele traz sitelinks, frases de destaque, snippets e ligação. Considere só os das campanhas ativas (campanha antiga, pausada ou removida, também devolve os dela). Preço não aparece nessa leitura: não marque preço como faltando sem perguntar.
+Essa ferramenta só traz o recurso ligado **à campanha**. Recurso ligado **ao grupo** (que vale no lugar do da campanha naquele grupo) não aparece nela: antes de dizer que falta sitelink, frase ou snippet, leia também os do grupo (1 execução):
+```sql
+SELECT campaign.status, ad_group.id, ad_group.name, ad_group.status, ad_group_asset.field_type, ad_group_asset.status,
+       asset.sitelink_asset.link_text, asset.callout_asset.callout_text, asset.structured_snippet_asset.header,
+       asset.final_urls
+FROM ad_group_asset
+WHERE ad_group_asset.status = 'ENABLED' AND campaign.status = 'ENABLED' AND ad_group.status = 'ENABLED'
+  AND ad_group_asset.field_type IN ('SITELINK', 'CALLOUT', 'STRUCTURED_SNIPPET', 'CALL')
+```
+Só falta recurso num grupo se ele não tiver nem o do grupo nem o da campanha. Confira também se o link de cada sitelink do grupo leva pra página daquele grupo.
 
 Sem conector: peça o export de **Anúncios** e de **Recursos** (CSV) e prints da tela "Ver detalhes dos recursos".
 
