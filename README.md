@@ -76,10 +76,10 @@ Cada revisão só lê a conta e salva um relatório em `google-ads/<negocio>/rev
 
 | Quando | Skill | O que ela faz | Execuções do Pipeboard |
 |---|---|---|---|
-| Toda segunda, 8h | `/revisar-termos` | Negativas e palavras novas, tiradas dos termos de pesquisa | ~3 |
-| Dias 1 e 15, 9h | `/revisar-anuncios` | Títulos fracos, força do anúncio, recursos e página | ~3 |
-| Dia 10, 9h | `/revisar-palavras` | Índice de qualidade, palavra sem entrega e palavra cara sem resultado | ~2 |
-| Dia 20, 9h | `/revisar-lances` | Verba (com o simulador do Google), lance e ajustes por dia, aparelho e cidade | 1 a 7 |
+| Toda semana (segunda, 8h) | `/revisar-termos` | Negativas e palavras novas, tiradas dos termos de pesquisa | ~3 |
+| 2 vezes por mês (todo dia 1º e 15, 9h) | `/revisar-anuncios` | Títulos fracos, força do anúncio, recursos e página | ~3 |
+| 1 vez por mês (todo dia 10, 9h) | `/revisar-palavras` | Índice de qualidade, palavra sem entrega e palavra cara sem resultado | ~2 |
+| 1 vez por mês (todo dia 20, 9h) | `/revisar-lances` | Verba (com o simulador do Google), lance e ajustes por dia, aparelho e cidade | 1 a 7 |
 | 1º de jan, abr, jul e out, 10h | `/auditoria` | Nota da conta de 0 a 100 e as 5 prioridades | ~10 |
 
 Tudo junto, numa conta, dá umas 30 execuções por mês (umas 7 por semana): cabe no plano grátis do Pipeboard (30 por semana), com folga pro trabalho na mão.

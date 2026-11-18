@@ -26,21 +26,21 @@ Primeiro, a tabela no chat (só as linhas que ainda não estão agendadas):
 
 | Quando | O que roda | O que ela procura | Execuções do Pipeboard |
 |---|---|---|---|
-| Toda segunda, 8h | Revisão de termos | Busca errada pra negativar e busca boa que vira palavra nova | ~3 por semana |
-| Dias 1 e 15, 9h | Revisão de anúncios | Título fraco, anúncio incompleto e recurso faltando | ~3 por vez |
-| Dia 10, 9h | Revisão de palavras | Palavra com nota baixa, sem impressão ou cara sem resultado | ~2 por mês |
-| Dia 20, 9h | Revisão de lances | Se faltou verba, se o clique está caro e onde ajustar | 1 a 7 por mês |
-| Dia 1º de jan, abr, jul e out, 10h | Auditoria | Nota da conta de 0 a 100 e as 5 prioridades | ~10 por vez |
-| Todo dia, 9h | Vigia de gasto | Avisa se uma campanha parou ou gastou 1,5x o orçamento do dia ou mais | 7 por semana |
-| Sexta, 17h | Resumo da semana | Gasto, contatos e o que mudou, pronto pro cliente | 1 por semana |
+| Toda semana (segunda, 8h) | Revisão de termos | Busca errada pra negativar e busca boa que vira palavra nova | ~3 por semana |
+| 2 vezes por mês (todo dia 1º e 15, 9h) | Revisão de anúncios | Título fraco, anúncio incompleto e recurso faltando | ~3 por vez |
+| 1 vez por mês (todo dia 10, 9h) | Revisão de palavras | Palavra com nota baixa, sem impressão ou cara sem resultado | ~2 por mês |
+| 1 vez por mês (todo dia 20, 9h) | Revisão de lances | Se faltou verba, se o clique está caro e onde ajustar | 1 a 7 por mês |
+| A cada 3 meses (dia 1º de jan, abr, jul e out, 10h) | Auditoria | Nota da conta de 0 a 100 e as 5 prioridades | ~10 por vez |
+| Todo dia (9h) | Vigia de gasto | Avisa se uma campanha parou ou gastou 1,5x o orçamento do dia ou mais | 7 por semana |
+| Toda semana (sexta, 17h) | Resumo da semana | Gasto, contatos e o que mudou, pronto pro cliente | 1 por semana |
 
 Depois, um popup com 3 perguntas (ferramenta `AskUserQuestion`). Mostre todas as opções que ainda não estão agendadas, não só a recomendada:
 
-**1. Revisões** (`multiSelect`): "<Negócio>: quais revisões deixo agendadas? Cada uma só lê a conta e salva um relatório. Recomendo as 4: juntas gastam umas 7 execuções por semana."
-- **Termos · toda segunda, 8h**: "Acha busca errada pra negativar e busca boa que vira palavra nova. É a que mais economiza no começo."
-- **Anúncios · dias 1 e 15, 9h**: "Acha título fraco, anúncio incompleto e recurso faltando."
-- **Palavras · dia 10, 9h**: "Acha palavra com nota baixa, sem impressão ou cara sem resultado."
-- **Lances · dia 20, 9h**: "Vê se faltou verba, se o clique está caro e onde ajustar."
+**1. Revisões** (`multiSelect`): "<Negócio>: quais revisões deixo rodando sozinhas, todo mês? Cada uma tem o seu ritmo e cai num dia diferente, pra não chegar tudo junto. Elas só leem a conta e salvam um relatório. Recomendo as 4: juntas gastam umas 7 execuções por semana."
+- **Termos · toda semana (segunda, 8h)**: "Toda semana, porque busca errada aparece todo dia. Acha o que negativar e a busca boa que vira palavra nova. É a que mais economiza no começo."
+- **Anúncios · 2 vezes por mês (dias 1º e 15, 9h)**: "A cada 15 dias, que é o tempo de um título juntar dado. Acha título fraco, anúncio incompleto e recurso faltando."
+- **Palavras · 1 vez por mês (todo dia 10, 9h)**: "Uma vez por mês, porque a nota de cada palavra muda devagar. Acha palavra com nota baixa, sem impressão ou cara sem resultado."
+- **Lances · 1 vez por mês (todo dia 20, 9h)**: "Uma vez por mês, porque o Google precisa de semanas pra se ajustar depois de cada mudança. Vê se faltou verba, se o clique está caro e onde ajustar."
 
 **2. Auditoria**: "E o raio-x completo da conta, com nota de 0 a 100 e as 5 prioridades?"
 - **A cada 3 meses (Recomendado)**: "No dia 1º de janeiro, abril, julho e outubro, às 10h. Umas 11 execuções por vez."
@@ -48,8 +48,8 @@ Depois, um popup com 3 perguntas (ferramenta `AskUserQuestion`). Mostre todas as
 - **Não agendar**: "Você roda quando quiser, com /auditoria."
 
 **3. Avisos** (`multiSelect`): "Quer também os avisos? Se não quiser nenhum, é só pular."
-- **Vigia de gasto · todo dia, 9h**: "Avisa só se uma campanha parou de gastar ou gastou 1,5x o orçamento do dia ou mais. Gasta 7 execuções por semana."
-- **Resumo da semana · sexta, 17h**: "Gasto, cliques, contatos e o que mudou, em texto pronto pra mandar pro cliente."
+- **Vigia de gasto · todo dia (9h)**: "Avisa só se uma campanha parou de gastar ou gastou 1,5x o orçamento do dia ou mais. Gasta 7 execuções por semana."
+- **Resumo da semana · toda semana (sexta, 17h)**: "Gasto, cliques, contatos e o que mudou, em texto pronto pra mandar pro cliente."
 
 Regras do popup: a pergunta se explica sozinha (o popup pode cobrir o chat); tudo em português; se ele escrever outro dia ou outra hora no "Outro", use o que ele pediu. Se a ferramenta de popup não existir, faça as 3 perguntas no chat.
 
